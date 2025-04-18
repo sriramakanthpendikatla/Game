@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Escape: Cyberbreach</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #000;
+            color: #0f0;
+            padding: 20px;
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://www.transparenttextures.com/patterns/cubes.png');
+            background-size: cover;
+            animation: backgroundAnimation 5s infinite alternate;
+        }
+        @keyframes backgroundAnimation {
+            from {background-position: 0 0;}
+            to {background-position: 100px 100px;}
+        }
+        .hidden { display: none; }
+        button { background-color: #0f0; color: #000; border: none; padding: 10px 20px; margin-top: 10px; cursor: pointer; font-weight: bold; }
+        input { padding: 5px; width: 300px; background-color: #000; color: #0f0; border: 1px solid #0f0; }
+        #timer { font-size: 20px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <audio id="start-sound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+    <audio id="correct-sound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+
+    <div id="intro">
+        <h1>🔒 Digital Escape: Cyberbreach 🔒</h1>
+        <p>Welcome, Agent.<br>
+        A hacker group called "The Phantom Collective" has infiltrated Quantum Dynamics.<br>
+        Your mission: Solve 5 coding puzzles to stop them.<br>
+        You have 20 minutes. Good luck!</p>
+        <button onclick="startMission()">Begin Mission</button>
+    </div>
+
+    <div id="game" class="hidden">
+        <div id="timer">Time Left: 20:00</div>
+        <h2 id="puzzle-title"></h2>
+        <p id="puzzle-question"></p>
+        <input type="text" id="answer" placeholder="Your Answer">
+        <br>
+        <button onclick="submitAnswer()">Submit</button>
+        <p id="feedback"></p>
+    </div>
+
+    <div id="result" class="hidden">
+        <h2 id="result-message"></h2>
+    </div>
+
+<script>
+    let puzzles = [
+        { question: "What is the output of this code?\nprint(3 + 2 * 2)", answer: "7" },
+        { question: "Fill in the blank to complete the loop:\nfor i in _____(5): print(i)", answer: "range" },
+        { question: "What keyword is used to define a function in Python?", answer: "def" },
+        { question: "Find the error:\n if 5 > 2\n    print('Yes')\n(Answer with one word)", answer: "colon" },
+        { question: "Predict the output:\nx = 5\ny = 10\nprint(x < y and y < 20)", answer: "True" }
+    ];
+
+    let currentPuzzle = 0;
+    let startTime;
+    let timerInterval;
+
+    function startMission() {
+        document.getElementById('intro').classList.add('hidden');
+        document.getElementById('game').classList.remove('hidden');
+        startTime = new Date();
+        document.getElementById('start-sound').play();
+        startTimer(1200);
+        showPuzzle();
+    }
+
+    function showPuzzle() {
+        document.getElementById('puzzle-title').innerText = `Puzzle ${currentPuzzle + 1}`;
+        document.getElementById('puzzle-question').innerText = puzzles[currentPuzzle].question;
+        document.getElementById('answer').value = '';
+        document.getElementById('feedback').innerText = '';
+    }
+
+    function submitAnswer() {
+        let userAnswer = document.getElementById('answer').value.trim();
+        if (userAnswer === puzzles[currentPuzzle].answer) {
+            document.getElementById('correct-sound').play();
+            currentPuzzle++;
+            if (currentPuzzle < puzzles.length) {
+                showPuzzle();
+            } else {
+                endMission();
+            }
+        } else {
+            document.getElementById('feedback').innerText = "❌ Incorrect. Try again, Agent.";
+        }
+    }
+
+    function endMission() {
+        clearInterval(timerInterval);
+        let endTime = new Date();
+        let elapsedSeconds = (endTime - startTime) / 1000;
+        document.getElementById('game').classList.add('hidden');
+        document.getElementById('result').classList.remove('hidden');
+        if (elapsedSeconds <= 1200) {
+            document.getElementById('result-message').innerText = "🎉 Mission Success! You stopped the cyber attack just in time!";
+        } else {
+            document.getElementById('result-message').innerText = "⏳ Mission Failed. The hackers completed the data transfer.";
+        }
+    }
+
+    function startTimer(duration) {
+        let timer = duration;
+        timerInterval = setInterval(function () {
+            let minutes = Math.floor(timer / 60);
+            let seconds = timer % 60;
+            document.getElementById('timer').textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            if (--timer < 0) {
+                clearInterval(timerInterval);
+                endMission();
+            }
+        }, 1000);
+    }
+</script>
+
+</body>
+</html>
